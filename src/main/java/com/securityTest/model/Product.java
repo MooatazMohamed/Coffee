@@ -32,7 +32,7 @@ public class Product {
     private String imageUrl;
 
     @Column(name = "is_available")
-    private boolean isAvailable;
+    private Boolean isAvailable;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
@@ -43,7 +43,7 @@ public class Product {
     private LocalDateTime updatedAt;
 
     @Column(name = "is_deleted")
-    private boolean isDeleted = false;
+    private Boolean isDeleted = false;
 
 
 }

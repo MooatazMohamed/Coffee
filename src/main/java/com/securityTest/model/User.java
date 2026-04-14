@@ -50,5 +50,5 @@ public class User {
     private LocalDateTime updatedAt;
 
     @Column(name = "is_deleted")
-    private boolean isDeleted = false;
+    private Boolean isDeleted = false;
 }

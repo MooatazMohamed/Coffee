@@ -1,7 +1,7 @@
 package com.Coffee.mapper.user;
 
-import com.Coffee.dto.login_sign.SignRequest;
-import com.Coffee.dto.login_sign.UserResponse;
+import com.Coffee.dto.auth.signup.SignRequest;
+import com.Coffee.dto.UserResponse;
 import com.Coffee.model.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

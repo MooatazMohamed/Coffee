@@ -1,8 +1,8 @@
 package com.Coffee.controller.user;
 
-import com.Coffee.dto.login_sign.LoginRequest;
-import com.Coffee.dto.login_sign.SignRequest;
-import com.Coffee.dto.login_sign.UserResponse;
+import com.Coffee.dto.auth.login.LoginRequest;
+import com.Coffee.dto.auth.signup.SignRequest;
+import com.Coffee.dto.UserResponse;
 import com.Coffee.handler.ApiResponse;
 import com.Coffee.model.User;
 import com.Coffee.service.security.UserService;

@@ -1,4 +1,4 @@
-package com.Coffee.dto.login_sign;
+package com.Coffee.dto.auth.signup;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

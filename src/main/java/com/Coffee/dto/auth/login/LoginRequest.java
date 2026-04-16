@@ -1,4 +1,4 @@
-package com.Coffee.dto.login_sign;
+package com.Coffee.dto.auth.login;
 
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;

@@ -23,7 +23,7 @@ public class Addon {
     private BigDecimal price;
 
     @Column(name = "is_available")
-    private boolean isAvailable;
+    private Boolean isAvailable = true;
 
     @ManyToMany(mappedBy = "addons", fetch = FetchType.LAZY)
     private List<Category> categories = new ArrayList<>();

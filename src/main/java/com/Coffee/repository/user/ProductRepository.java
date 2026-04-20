@@ -24,5 +24,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "WHERE p.isAvailable = true AND p.isDeleted = false")
     List<Product> findAllWithCategory();
 
+    @Query("SELECT p FROM Product p " +
+            "WHERE p.id = :id AND p.isAvailable = true AND p.isDeleted = false")
+    Optional<Product> findByIdAndAvailable(@Param("id") Long id);
+
     List<Product> findTop8ByIsAvailableTrueAndIsDeletedFalseOrderByCreatedAtDesc();
 }

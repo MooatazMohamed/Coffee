@@ -1,10 +1,14 @@
 package com.Coffee.service.user.Impl;
 
-import com.Coffee.dto.user.request.PriceCalculationResponse;
-import com.Coffee.dto.user.request.ProductCustomizationRequest;
+import com.Coffee.dto.user.response.PriceCalculationResponse;
+import com.Coffee.dto.user.response.AddonOption;
+import com.Coffee.dto.user.response.AddonPrice;
 import com.Coffee.dto.user.response.CategoryResponse;
+import com.Coffee.dto.user.response.PriceCalculationResponse;
 import com.Coffee.dto.user.response.ProductDetailResponse;
 import com.Coffee.dto.user.response.ProductResponse;
+import com.Coffee.dto.user.response.SizeOption;
+import com.Coffee.dto.user.request.ProductCustomizationRequest;
 import com.Coffee.handler.ResourceNotFoundException;
 import com.Coffee.mapper.user.ProductMapper;
 import com.Coffee.model.Addon;
@@ -50,8 +54,8 @@ public class ProductBrowsingServiceImpl implements ProductBrowsingService {
 
     @Override
     public List<ProductResponse> getProductsByCategory(Long categoryId) {
-        // Verify category exists
-        categoryRepository.findById(categoryId)
+        // Verify category exists and is not soft-deleted
+        categoryRepository.findByIdAndIsDeletedFalse(categoryId)
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + categoryId));
 
         List<Product> products = productRepository.findByCategoryIdAndIsAvailableTrueAndIsDeletedFalse(categoryId);
@@ -63,20 +67,27 @@ public class ProductBrowsingServiceImpl implements ProductBrowsingService {
         Product product = productRepository.findByIdWithSizes(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + productId));
 
+        // Check product is available
+        if (!Boolean.TRUE.equals(product.getIsAvailable())) {
+            throw new ResourceNotFoundException("Product not found with id: " + productId);
+        }
+
         ProductDetailResponse response = productMapper.toDetailResponse(product);
 
         // Get add-ons for this product's category
         if (product.getCategory() != null) {
             List<Addon> categoryAddons = addonRepository.findAddonsByCategoryId(product.getCategory().getId());
-            List<ProductDetailResponse.AddonOption> addonOptions = categoryAddons.stream()
+            List<AddonOption> addonOptions = categoryAddons.stream()
                     .map(this::mapToAddonOption)
                     .collect(Collectors.toList());
             response.setAddons(addonOptions);
+        } else {
+            response.setAddons(List.of());
         }
 
         // Set default selected size (smallest price)
         if (response.getSizes() != null && !response.getSizes().isEmpty()) {
-            ProductDetailResponse.SizeOption defaultSize = response.getSizes().stream()
+            SizeOption defaultSize = response.getSizes().stream()
                     .min((s1, s2) -> Double.compare(s1.getPrice(), s2.getPrice()))
                     .orElse(null);
             if (defaultSize != null) {
@@ -91,20 +102,43 @@ public class ProductBrowsingServiceImpl implements ProductBrowsingService {
     public PriceCalculationResponse calculatePrice(ProductCustomizationRequest request) {
         PriceCalculationResponse response = new PriceCalculationResponse();
 
-        // Get selected size price
-        ProductSize selectedSize = productSizeRepository.findById(request.getSelectedSizeId())
+        // Validate product exists and is available
+        Product product = productRepository.findByIdAndAvailable(request.getProductId())
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + request.getProductId()));
+
+        // Get selected size price, excluding soft-deleted sizes
+        ProductSize selectedSize = productSizeRepository.findByIdWithProduct(request.getSelectedSizeId())
                 .orElseThrow(() -> new ResourceNotFoundException("Size not found"));
+
+        // Validate size belongs to the requested product
+        if (!selectedSize.getProduct().getId().equals(request.getProductId())) {
+            throw new ResourceNotFoundException("Size does not belong to the requested product");
+        }
 
         response.setSelectedSizePrice(selectedSize.getPrice());
         response.setBasePrice(selectedSize.getPrice()); // Base is the size price
 
         // Calculate add-ons total
         if (request.getSelectedAddonIds() != null && !request.getSelectedAddonIds().isEmpty()) {
+            // Get all valid addons for this product's category
+            List<Addon> validCategoryAddons = product.getCategory() != null
+                    ? addonRepository.findAddonsByCategoryId(product.getCategory().getId())
+                    : List.of();
+
             List<Addon> selectedAddons = addonRepository.findByIdInAndIsAvailableTrueAndIsDeletedFalse(
                     request.getSelectedAddonIds()
             );
 
-            List<PriceCalculationResponse.AddonPrice> addonPrices = selectedAddons.stream()
+            // Validate all selected addons belong to the product's category
+            for (Addon addon : selectedAddons) {
+                boolean isValid = validCategoryAddons.stream()
+                        .anyMatch(ca -> ca.getId().equals(addon.getId()));
+                if (!isValid) {
+                    throw new ResourceNotFoundException("Addon not available for this product's category");
+                }
+            }
+
+            List<AddonPrice> addonPrices = selectedAddons.stream()
                     .map(this::mapToAddonPrice)
                     .collect(Collectors.toList());
 
@@ -132,8 +166,8 @@ public class ProductBrowsingServiceImpl implements ProductBrowsingService {
         return response;
     }
 
-    private ProductDetailResponse.AddonOption mapToAddonOption(Addon addon) {
-        ProductDetailResponse.AddonOption option = new ProductDetailResponse.AddonOption();
+    private AddonOption mapToAddonOption(Addon addon) {
+        AddonOption option = new AddonOption();
         option.setId(addon.getId());
         option.setName(addon.getName());
         option.setPrice(addon.getPrice().doubleValue());
@@ -141,8 +175,8 @@ public class ProductBrowsingServiceImpl implements ProductBrowsingService {
         return option;
     }
 
-    private PriceCalculationResponse.AddonPrice mapToAddonPrice(Addon addon) {
-        PriceCalculationResponse.AddonPrice addonPrice = new PriceCalculationResponse.AddonPrice();
+    private AddonPrice mapToAddonPrice(Addon addon) {
+        AddonPrice addonPrice = new AddonPrice();
         addonPrice.setId(addon.getId());
         addonPrice.setName(addon.getName());
         addonPrice.setPrice(addon.getPrice().doubleValue());

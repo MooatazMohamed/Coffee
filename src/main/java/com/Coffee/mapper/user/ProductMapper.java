@@ -34,8 +34,8 @@ public interface ProductMapper {
     default Double getSmallestSizePrice(List<ProductSize> sizes) {
         if (sizes == null || sizes.isEmpty()) return 0.0;
         return sizes.stream()
-                .filter(size -> Boolean.FALSE.equals(size.getIsDeleted()))
-                .mapToDouble(ProductSize::getPrice)
+                .filter(size -> !Boolean.TRUE.equals(size.getIsDeleted()))
+                .mapToDouble(size -> size.getPrice().doubleValue())
                 .min()
                 .orElse(0.0);
     }
@@ -44,7 +44,7 @@ public interface ProductMapper {
     default List<SizeOption> mapSizes(List<ProductSize> sizes) {
         if (sizes == null) return null;
         return sizes.stream()
-                .filter(size -> Boolean.FALSE.equals(size.getIsDeleted()))
+                .filter(size -> !Boolean.TRUE.equals(size.getIsDeleted()))
                 .map(this::toSizeOption)
                 .collect(Collectors.toList());
     }

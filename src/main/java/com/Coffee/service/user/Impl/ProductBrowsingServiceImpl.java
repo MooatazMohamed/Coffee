@@ -115,8 +115,8 @@ public class ProductBrowsingServiceImpl implements ProductBrowsingService {
             throw new ResourceNotFoundException("Size does not belong to the requested product");
         }
 
-        response.setSelectedSizePrice(selectedSize.getPrice());
-        response.setBasePrice(selectedSize.getPrice()); // Base is the size price
+        response.setSelectedSizePrice(selectedSize.getPrice().doubleValue());
+        response.setBasePrice(selectedSize.getPrice().doubleValue()); // Base is the size price
 
         // Calculate add-ons total
         if (request.getSelectedAddonIds() != null && !request.getSelectedAddonIds().isEmpty()) {
@@ -148,10 +148,10 @@ public class ProductBrowsingServiceImpl implements ProductBrowsingService {
                     .mapToDouble(addon -> addon.getPrice().doubleValue())
                     .sum();
 
-            response.setTotalPrice(selectedSize.getPrice() + addonsTotal);
+            response.setTotalPrice(selectedSize.getPrice().doubleValue() + addonsTotal);
         } else {
             response.setSelectedAddons(List.of());
-            response.setTotalPrice(selectedSize.getPrice());
+            response.setTotalPrice(selectedSize.getPrice().doubleValue());
         }
 
         return response;
@@ -171,7 +171,7 @@ public class ProductBrowsingServiceImpl implements ProductBrowsingService {
         option.setId(addon.getId());
         option.setName(addon.getName());
         option.setPrice(addon.getPrice().doubleValue());
-        option.setIsAvailable(addon.isAvailable());
+        option.setIsAvailable(addon.getIsAvailable());
         return option;
     }
 

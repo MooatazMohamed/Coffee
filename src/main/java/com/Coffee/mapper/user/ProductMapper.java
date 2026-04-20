@@ -1,7 +1,9 @@
 package com.Coffee.mapper.user;
 
+import com.Coffee.dto.user.response.AddonOption;
 import com.Coffee.dto.user.response.ProductDetailResponse;
 import com.Coffee.dto.user.response.ProductResponse;
+import com.Coffee.dto.user.response.SizeOption;
 import com.Coffee.model.Product;
 import com.Coffee.model.ProductSize;
 import org.mapstruct.Mapper;
@@ -23,29 +25,27 @@ public interface ProductMapper {
     @Mapping(target = "addons", ignore = true) // Will be set separately
     ProductDetailResponse toDetailResponse(Product product);
 
+    // Automatic mapping for ProductSize -> SizeOption
+    @Mapping(target = "isSelected", constant = "false")
+    SizeOption toSizeOption(ProductSize size);
+
+    // Helper methods for complex logic
     @Named("getSmallestSizePrice")
     default Double getSmallestSizePrice(List<ProductSize> sizes) {
         if (sizes == null || sizes.isEmpty()) return 0.0;
         return sizes.stream()
-                .filter(size -> !size.getIsDeleted())
+                .filter(size -> Boolean.FALSE.equals(size.getIsDeleted()))
                 .mapToDouble(ProductSize::getPrice)
                 .min()
                 .orElse(0.0);
     }
 
     @Named("mapSizes")
-    default List<ProductDetailResponse.SizeOption> mapSizes(List<ProductSize> sizes) {
+    default List<SizeOption> mapSizes(List<ProductSize> sizes) {
         if (sizes == null) return null;
         return sizes.stream()
-                .filter(size -> !size.getIsDeleted())
-                .map(size -> {
-                    ProductDetailResponse.SizeOption option = new ProductDetailResponse.SizeOption();
-                    option.setId(size.getId());
-                    option.setSize(size.getSize());
-                    option.setPrice(size.getPrice());
-                    option.setIsSelected(false);
-                    return option;
-                })
+                .filter(size -> Boolean.FALSE.equals(size.getIsDeleted()))
+                .map(this::toSizeOption)
                 .collect(Collectors.toList());
     }
 }

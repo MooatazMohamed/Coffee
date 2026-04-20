@@ -1,4 +1,4 @@
-package com.Coffee.dto.user.request;
+package com.Coffee.dto.user.response;
 
 import lombok.Data;
 
@@ -10,11 +10,5 @@ public class PriceCalculationResponse {
     private Double selectedSizePrice;
     private List<AddonPrice> selectedAddons;
     private Double totalPrice;
-
-    @Data
-    public static class AddonPrice {
-        private Long id;
-        private String name;
-        private Double price;
-    }
 }
+

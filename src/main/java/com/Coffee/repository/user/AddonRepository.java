@@ -19,4 +19,6 @@ public interface AddonRepository extends JpaRepository<Addon, Long> {
     List<Addon> findAddonsByCategoryId(@Param("categoryId") Long categoryId);
 
     List<Addon> findByIdInAndIsAvailableTrueAndIsDeletedFalse(List<Long> ids);
+
+    List<Addon> findByIsDeletedFalse();
 }

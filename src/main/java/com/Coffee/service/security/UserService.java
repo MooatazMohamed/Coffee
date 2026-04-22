@@ -34,7 +34,7 @@ public class UserService {
     private RoleRepository roleRepository;
 
     private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
-
+// sign up
     public UserResponse save(SignRequest signRequest){
         User existingEmail = userRepository.findByEmail(signRequest.getEmail());
         if(existingEmail!=null){

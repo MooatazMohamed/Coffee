@@ -32,7 +32,7 @@ public class OrderItem {
     private BigDecimal price;
 
     @Column(name = "total_price")
-    private double totalPrice;
+    private BigDecimal totalPrice;
 
     private String notes;
 

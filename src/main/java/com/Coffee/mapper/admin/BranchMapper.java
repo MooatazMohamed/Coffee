@@ -15,6 +15,7 @@ public interface BranchMapper {
     Branch branchDtoToEntity(BranchRequestDTO dto);
 
     @Mapping(target = "branchAdmin", expression = "java(extractAdmin(branch))")
+    @Mapping(target = "id", source = "id")
     BranchResponseDTO branchEntitytoDto(Branch branch);
 
 

@@ -2,6 +2,8 @@ package com.Coffee.service.admin;
 
 import com.Coffee.dto.admin.request.BranchRequestDTO;
 import com.Coffee.dto.admin.response.BranchResponseDTO;
+import com.Coffee.dto.admin.response.BranchesOrder;
+import com.Coffee.handler.ApiResponse;
 import com.Coffee.mapper.admin.BranchMapper;
 import com.Coffee.mapper.user.UserMapper;
 import com.Coffee.model.Branch;
@@ -100,6 +102,12 @@ public  void deleteBranch(Long branchId) throws IOException {
     } // end of deleted branch
 
 
+    public ApiResponse<List<BranchesOrder>> getAllOrdersForAllBranches(Long branchId, String search){
+        return ApiResponse.success(
+                "Data Retrieved Success",
+                branchRepository.getAllOrdersForAllBranches(branchId, search)
+        );
+    }
 
 
 }

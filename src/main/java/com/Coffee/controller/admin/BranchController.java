@@ -17,13 +17,14 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/branch")
+@PreAuthorize("hasRole('ADMIN')")
 public class BranchController {
 
 @Autowired
     BranchService branchService;
 
     @GetMapping("")
-    public ApiResponse<List<BranchResponseDTO>> AllClubs(){
+    public ApiResponse<List<BranchResponseDTO>> AllBranches(){
         return ApiResponse.success("Branchs retrivied successfully",branchService.getAllBranches());
         // HttpStatus.OK
 

@@ -7,7 +7,7 @@ import lombok.Setter;
 @Setter
 @Getter
 @AllArgsConstructor
-public class BranchResponse {
+public class UserBranchResponse {
     private Integer id;
     private String name;
     private String address;

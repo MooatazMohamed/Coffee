@@ -8,10 +8,20 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface BranchRepository extends JpaRepository<Branch,Long> {
-   // List<Branch> findByIsDeletedFalse();
+
+    // ─── User Use Cases ─────────────────────────────
+    List<Branch> findByIsDeletedFalse();
+
+    Optional<Branch> findByIdAndIsDeletedFalse(Long id);
+
+    // ─── Admin Use Cases ────────────────────────────
+
+
+    // List<Branch> findByIsDeletedFalse();
 
     @Query("""
 SELECT new com.Coffee.dto.admin.response.BranchesOrder(
@@ -24,7 +34,7 @@ SELECT new com.Coffee.dto.admin.response.BranchesOrder(
     b.id,
     o.status
 )
-FROM Order o
+FROM com.Coffee.model.Order o
 LEFT JOIN o.user u
 LEFT JOIN o.branch b
 WHERE (:branchId IS NULL OR b.id = :branchId)

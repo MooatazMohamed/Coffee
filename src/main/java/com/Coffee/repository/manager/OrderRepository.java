@@ -1,8 +1,6 @@
 package com.Coffee.repository.manager;
 
-import org.springframework.stereotype.Repository;
-
-@Repository
+//  ─────────────────────── XX  ─────── USED IN THE USER ─────── XX  ─────────────────────────────
 public interface OrderRepository {
 
 }

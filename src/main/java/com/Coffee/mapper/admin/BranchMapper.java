@@ -3,17 +3,25 @@ package com.Coffee.mapper.admin;
 import com.Coffee.dto.UserResponse;
 import com.Coffee.dto.admin.request.BranchRequestDTO;
 import com.Coffee.dto.admin.response.BranchResponseDTO;
-import com.Coffee.dto.auth.signup.SignRequest;
+import com.Coffee.dto.user.response.UserBranchResponse;
 import com.Coffee.mapper.user.UserMapper;
 import com.Coffee.model.Branch;
 import com.Coffee.model.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring" , uses = {UserMapper.class})
 public interface BranchMapper {
-    Branch branchDtoToEntity(BranchRequestDTO dto);
 
+    // ─── User Use Cases ─────────────────────────────
+    UserBranchResponse toBranchResponse(Branch branch);
+
+    List<UserBranchResponse> toBranchResponseList(List<Branch> branches);
+
+    // ─── Admin Use Cases ────────────────────────────
+    Branch branchDtoToEntity(BranchRequestDTO dto);
     @Mapping(target = "branchAdmin", expression = "java(extractAdmin(branch))")
     @Mapping(target = "id", source = "id")
     BranchResponseDTO branchEntitytoDto(Branch branch);
@@ -25,7 +33,5 @@ public interface BranchMapper {
         User admin = branch.getUsers().get(0);
         return new UserResponse(admin.getEmail() ,admin.getName() , admin.getRole().getName());
     }
-
-
 }
 

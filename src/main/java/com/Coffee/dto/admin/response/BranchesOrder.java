@@ -1,5 +1,7 @@
 package com.Coffee.dto.admin.response;
 
+import com.Coffee.enums.OrderStatus;
+import com.Coffee.enums.OrderType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,8 +18,8 @@ public class BranchesOrder {
     private String userName;
     private String branchName;
     private BigDecimal totalPrice;
-    private String type;
+    private OrderType type;
     private LocalDateTime createdAt;
     private Long branchId;
-    private String status;
+    private OrderStatus status;
 }

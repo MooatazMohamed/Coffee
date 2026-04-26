@@ -1,5 +1,6 @@
 package com.Coffee.service.security;
 
+import com.Coffee.model.Branch;
 import com.Coffee.model.Role;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -41,13 +42,16 @@ public class JWTService {
 
     }
 
-    public String generateToken(Long id, String name, String email, Role role){
+    public String generateToken(Long id, String name, String email, Role role , Long branchId){
         Map<String,Object> claims = new HashMap<>();
 
         claims.put("id", id);
         claims.put("name", name);
         claims.put("email", email);
         claims.put("role",role.getName());
+        if(role.getName().equals("MANAGER")){
+            claims.put("branch_id", branchId);
+        }
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(email)
@@ -56,6 +60,11 @@ public class JWTService {
                 .signWith(getKey(), SignatureAlgorithm.HS256).compact();
     }
 
+    public Long extractBranchId(String token) {
+        Claims claims = extractAllClaims(token);
+        System.out.println(claims);
+        return ((Number) claims.get("branch_id")).longValue();
+    }
     public Long extractId(String token){
         return extractClaim(token, claims -> claims.get("id", Long.class));
     }
@@ -84,6 +93,7 @@ public class JWTService {
     }
 
     private Claims extractAllClaims(String token) {
+        token = token.replace("Bearer ", "").trim();
         return Jwts.parserBuilder()
                 .setSigningKey(getKey())
                 .build().parseClaimsJws(token).getBody();

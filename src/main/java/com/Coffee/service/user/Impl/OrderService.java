@@ -1,11 +1,13 @@
 package com.Coffee.service.user.Impl;
 
+import com.Coffee.dto.manager.response.OrderResponseDTO;
 import com.Coffee.dto.user.request.OrderItemAddonRequest;
 import com.Coffee.dto.user.request.OrderItemRequest;
 import com.Coffee.dto.user.request.PlaceOrderRequest;
 import com.Coffee.dto.user.response.OrderResponse;
 import com.Coffee.enums.OrderStatus;
 import com.Coffee.enums.OrderType;
+import com.Coffee.handler.ApiResponse;
 import com.Coffee.handler.ResourceNotFoundException;
 import com.Coffee.mapper.admin.AddonMapper;
 import com.Coffee.mapper.user.OrderItemMapper;
@@ -14,6 +16,7 @@ import com.Coffee.model.*;
 //import com.Coffee.repository.user.*;
 import com.Coffee.repository.admin.BranchRepository;
 import com.Coffee.repository.user.*;
+import com.Coffee.service.security.JWTService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -36,6 +39,7 @@ public class OrderService {
     private final OrderMapper orderMapper;
     private final OrderItemMapper orderItemMapper;
     private final AddonMapper addonMapper;
+    private final JWTService jwtService;
 
     @Transactional
     public OrderResponse placeOrder(PlaceOrderRequest request, Long userId) {
@@ -121,5 +125,23 @@ public class OrderService {
 
     private String generateOrderNumber() {
         return "#ORD-" + (System.currentTimeMillis() % 9000 + 1000);
+    }
+
+
+    //Get Orders For One Branch MANAGER
+    public ApiResponse<List<OrderResponseDTO>> getOrdersForOneBranchByBranchId(String token) {
+        Long branchId = jwtService.extractBranchId(token);
+        List<Order> orders = orderRepository.getOrdersByBranchId(branchId);
+
+        List<OrderResponseDTO> dtoList = orderMapper.toDTOList(orders);
+
+        // تأكد من تصفير الـ pickupTime إذا لم يكن pre-order (اختياري حسب رغبتك)
+        dtoList.forEach(order -> {
+            if (order.getType() != OrderType.PRE_ORDER) {
+                order.setPickupTime(null);
+            }
+        });
+
+        return ApiResponse.success("Orders Retrieved Successfully", dtoList);
     }
 }

@@ -1,5 +1,6 @@
 package com.Coffee.controller.user;
 
+import com.Coffee.dto.manager.response.OrderResponseDTO;
 import com.Coffee.dto.user.request.PlaceOrderRequest;
 import com.Coffee.dto.user.response.OrderResponse;
 import com.Coffee.handler.ApiResponse;
@@ -54,5 +55,10 @@ public class OrderController {
         OrderResponse order = orderService.getOrderById(orderId,userId);
         return ResponseEntity
                 .ok(ApiResponse.success("Order retrieved successfully",order));
+    }
+
+    @GetMapping("/getOrdersBranch")
+    public ResponseEntity<ApiResponse<List<OrderResponseDTO>>> getOrdersForOneBranchByBranchId(@RequestHeader("Authorization") String token){
+        return ResponseEntity.ok(orderService.getOrdersForOneBranchByBranchId(token));
     }
 }

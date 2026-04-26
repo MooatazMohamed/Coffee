@@ -65,7 +65,8 @@ public class UserService {
                 user.getId(),
                 user.getName(),
                 user.getEmail(),
-                user.getRole()
+                user.getRole(),
+                user.getBranch().getId()
         );
 
         Map<String, String> data = new HashMap<>();

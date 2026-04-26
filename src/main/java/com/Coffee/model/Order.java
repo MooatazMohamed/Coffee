@@ -1,5 +1,7 @@
 package com.Coffee.model;
 
+import com.Coffee.enums.OrderStatus;
+import com.Coffee.enums.OrderType;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,8 +24,11 @@ public class Order {
     @Column(name = "order_number", unique = true)
     private String orderNumber;
 
-    private String status;
-    private String type;
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
+
+    @Enumerated(EnumType.STRING)
+    private OrderType type;
 
     @Column(name = "pickup_time")
     private LocalDateTime pickupTime;
@@ -40,7 +45,7 @@ public class Order {
     @JoinColumn(name = "branch_id")
     private Branch branch;
 
-    @OneToMany(mappedBy = "order",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "order",cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<OrderItem> orderItems = new ArrayList<>();
 
     @CreationTimestamp

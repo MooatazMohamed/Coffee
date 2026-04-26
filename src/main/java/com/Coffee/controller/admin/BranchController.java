@@ -2,6 +2,7 @@ package com.Coffee.controller.admin;
 
 import com.Coffee.dto.admin.request.BranchRequestDTO;
 import com.Coffee.dto.admin.response.BranchResponseDTO;
+import com.Coffee.dto.admin.response.BranchesOrder;
 import com.Coffee.handler.ApiResponse;
 import com.Coffee.service.admin.BranchService;
 import jakarta.validation.Valid;
@@ -16,6 +17,7 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
+@PreAuthorize("hasRole('ADMIN')")
 @RequestMapping("/api/branch")
 @PreAuthorize("hasRole('ADMIN')")
 public class BranchController {
@@ -51,4 +53,13 @@ public class BranchController {
         return ApiResponse.success("Branch deleted successfully",null); // ,HttpStatus.OK
     }
 
+    @GetMapping("/allOrdersBranches")
+    public ResponseEntity<ApiResponse<List<BranchesOrder>>> getAllOrdersForAllBranches(
+            @RequestParam(required = false) Long branchId,
+            @RequestParam(required = false) String search
+    ){
+        return ResponseEntity.ok(
+                branchService.getAllOrdersForAllBranches(branchId, search)
+        );
+    }
 }

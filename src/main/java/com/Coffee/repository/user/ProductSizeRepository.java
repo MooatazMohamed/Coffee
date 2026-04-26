@@ -15,4 +15,14 @@ public interface ProductSizeRepository extends JpaRepository<ProductSize, Long> 
             "JOIN FETCH ps.product " +
             "WHERE ps.id = :id AND ps.isDeleted = false")
     Optional<ProductSize> findByIdWithProduct(@Param("id") Long id);
+
+    @Query("""
+        SELECT ps FROM ProductSize ps
+        JOIN ps.product p
+        WHERE ps.id = :id
+        AND ps.isDeleted = false
+        AND p.isDeleted = false
+        AND p.isAvailable = true
+    """)
+    Optional<ProductSize> findActiveById(@Param("id") Long id);
 }

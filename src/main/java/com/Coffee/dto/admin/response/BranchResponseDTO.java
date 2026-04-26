@@ -12,6 +12,7 @@ public record BranchResponseDTO(
         String address,
         String phone,
         Boolean isDeleted,
-        UserResponse branchAdmin  // dto response [name , email , role]
+        UserResponse branchAdmin,  // dto response [name , email , role]
+        Long id
 ) {
 }

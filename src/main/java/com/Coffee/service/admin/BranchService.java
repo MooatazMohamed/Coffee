@@ -2,6 +2,9 @@ package com.Coffee.service.admin;
 
 import com.Coffee.dto.admin.request.BranchRequestDTO;
 import com.Coffee.dto.admin.response.BranchResponseDTO;
+import com.Coffee.dto.admin.response.BranchesOrder;
+import com.Coffee.dto.user.response.UserBranchResponse;
+import com.Coffee.handler.ApiResponse;
 import com.Coffee.mapper.admin.BranchMapper;
 import com.Coffee.mapper.user.UserMapper;
 import com.Coffee.model.Branch;
@@ -25,8 +28,8 @@ public class BranchService {
     BranchMapper branchMapper;
     @Autowired
     UserMapper userMapper;
-  @Autowired
-  PasswordEncoder passwordEncoder;
+    @Autowired
+    PasswordEncoder passwordEncoder;
     @Autowired
     private RoleRepository roleRepository;
     @Autowired
@@ -35,16 +38,16 @@ public class BranchService {
     private BranchRepository branchRepository;
 
     @Transactional
-// get active branch
-public List<BranchResponseDTO> getAllBranches() {
+    // get active branch
+    public List<BranchResponseDTO> getAllBranches() {
     return branchRepository.findAll()
             .stream()
             .map(branchMapper::branchEntitytoDto)
             .toList();
-}
+    }
 
-// create branch method
-public BranchResponseDTO  createBranch(BranchRequestDTO branchRequestDTO){
+    // create branch method
+    public BranchResponseDTO  createBranch(BranchRequestDTO branchRequestDTO){
 
       Branch branch = branchMapper.branchDtoToEntity(branchRequestDTO);
 
@@ -61,45 +64,57 @@ public BranchResponseDTO  createBranch(BranchRequestDTO branchRequestDTO){
       if(userRepository.existsByEmail(getUser.getEmail())) {
           throw new RuntimeException("Email already exists");
       }
-// uni direction  one direction
-//      Branch savedBranch = branchRepository.save(branch);
-//      getUser.setBranch(savedBranch);
-//      userRepository.save(getUser);
-//bi direction  two direction
+    // uni direction  one direction
+    //      Branch savedBranch = branchRepository.save(branch);
+    //      getUser.setBranch(savedBranch);
+    //      userRepository.save(getUser);
+    //bi direction  two direction
       getUser.setBranch(branch);
       branch.setUsers(List.of(getUser));
       BranchResponseDTO branchDto = branchMapper.branchEntitytoDto(branchRepository.save(branch))  ;
 
       return branchDto;
 
-  }  // end of create branch method
+    }  // end of create branch method
 
-// update branch
-public BranchResponseDTO updateBranch(Long branchId,BranchRequestDTO branchRequestDTO) throws IOException {
+    // update branch
+    public BranchResponseDTO updateBranch(Long branchId,BranchRequestDTO branchRequestDTO) throws IOException {
     Branch branch = this.branchRepository.findById(branchId).orElseThrow(()-> new RuntimeException("Branch not found"));
 
     Branch updateBranch = branchMapper.branchDtoToEntity(branchRequestDTO);
-  //  this.branchMapper.branchDtoToEntity(clubRequestDTO,branch);
+    //  this.branchMapper.branchDtoToEntity(clubRequestDTO,branch);
 
     Branch saveClub =  this.branchRepository.save(updateBranch);
     return this.branchMapper.branchEntitytoDto(saveClub);
-}// end of update method
+    }// end of update method
 
 
-@Transactional  // because lazy in branch entity
-public  void deleteBranch(Long branchId) throws IOException {
+    @Transactional  // because lazy in branch entity
+    public  void deleteBranch(Long branchId) throws IOException {
         Branch branch = this.branchRepository.findById(branchId).orElseThrow(()-> new RuntimeException("Branch not found"));
 
 
-  //  branch.getUsers().forEach(user -> user.setIsDeleted(true));
+    //  branch.getUsers().forEach(user -> user.setIsDeleted(true));
     userRepository.softDeleteUsersByBranchId(branchId); //delete from database is best
     branch.setIsDeleted(true);
         this.branchRepository.save(branch);
 
-//        this.clubRepository.deleteById(club.getId());
+    //        this.clubRepository.deleteById(club.getId());
     } // end of deleted branch
 
 
+    public ApiResponse<List<BranchesOrder>> getAllOrdersForAllBranches(Long branchId, String search){
+        return ApiResponse.success(
+                "Data Retrieved Success",
+                branchRepository.getAllOrdersForAllBranches(branchId, search)
+        );
+    }
 
 
+    // ─── User Use Cases ─────────────────────────────
+
+    public List<UserBranchResponse> getAllBranchesForUsers(){
+        List<Branch> branches = branchRepository.findByIsDeletedFalse();
+        return branchMapper.toBranchResponseList(branches);
+    }
 }

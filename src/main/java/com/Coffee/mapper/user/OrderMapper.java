@@ -14,6 +14,7 @@ public interface OrderMapper {
     @Mapping(source = "branch.name", target = "branchName")
     @Mapping(source = "status", target = "status")
     @Mapping(source = "orderItems", target = "items")
+    @Mapping(source = "totalPrice", target = "totalPrice")
     OrderResponse toOrderResponse(Order order);
 
     List<OrderResponse> toOrderResponseList(List<Order> orders);

@@ -49,7 +49,8 @@ public class JWTService {
         claims.put("name", name);
         claims.put("email", email);
         claims.put("role",role.getName());
-        if(role.getName().equals("MANAGER")){
+        // Only add branch_id if role is MANAGER and branchId is not null
+        if(role.getName().equals("MANAGER") && branchId != null){
             claims.put("branch_id", branchId);
         }
         return Jwts.builder()

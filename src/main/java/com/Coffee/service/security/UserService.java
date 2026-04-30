@@ -61,12 +61,13 @@ public class UserService {
             return ApiResponse.error("Login failed", "Invalid email or password");
         }
 
+        Long branchId = user.getBranch() != null ? user.getBranch().getId() : null;
         String token = jwtService.generateToken(
                 user.getId(),
                 user.getName(),
                 user.getEmail(),
                 user.getRole(),
-                user.getBranch().getId()
+                branchId
         );
 
         Map<String, String> data = new HashMap<>();

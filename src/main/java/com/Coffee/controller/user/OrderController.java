@@ -3,6 +3,7 @@ package com.Coffee.controller.user;
 import com.Coffee.dto.manager.response.OrderResponseDTO;
 import com.Coffee.dto.user.request.PlaceOrderRequest;
 import com.Coffee.dto.user.response.OrderResponse;
+import com.Coffee.enums.OrderStatus;
 import com.Coffee.handler.ApiResponse;
 import com.Coffee.model.UserPrincipal;
 import com.Coffee.service.security.MyUserDetailsService;
@@ -58,7 +59,21 @@ public class OrderController {
     }
 
     @GetMapping("/getOrdersBranch")
-    public ResponseEntity<ApiResponse<List<OrderResponseDTO>>> getOrdersForOneBranchByBranchId(@RequestHeader("Authorization") String token){
-        return ResponseEntity.ok(orderService.getOrdersForOneBranchByBranchId(token));
+    public ResponseEntity<ApiResponse<List<OrderResponseDTO>>>
+    getOrdersForOneBranchByBranchId(@RequestHeader("Authorization") String token ,
+                                    @RequestParam(required = false) String search){
+        return ResponseEntity.ok(orderService.getOrdersForOneBranchByBranchId(token , search));
+    }
+
+    @PutMapping("/changeStatus/{id}")
+    public ResponseEntity<ApiResponse<String>> changeStatusOfORder(@PathVariable Long id , @RequestParam OrderStatus orderStatus){
+        return ResponseEntity.ok(orderService.changeStatusOfOrder(id, orderStatus));
+    }
+
+    @GetMapping("/getOrdersBranchReady")
+    public ApiResponse<List<OrderResponseDTO>> getReadyOrders(
+            @RequestHeader("Authorization") String token,
+            @RequestParam(required = false) String search) {
+        return orderService.getOrdersForOneBranchByBranchIdAndStatusIsREADY(token, search);
     }
 }

@@ -1,5 +1,6 @@
 package com.Coffee.dto.manager.response;
 
+import com.Coffee.enums.OrderStatus;
 import com.Coffee.enums.OrderType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,6 +20,7 @@ public class OrderResponseDTO {
     private BigDecimal totalPrice;
     private LocalDateTime createdAt;
     private OrderType type;
+    private OrderStatus status;
     private LocalDateTime pickupTime;
     private List<OrderItemDTO> products;
 }

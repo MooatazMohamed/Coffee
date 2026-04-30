@@ -26,6 +26,7 @@ import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -129,13 +130,12 @@ public class OrderService {
 
 
     //Get Orders For One Branch MANAGER
-    public ApiResponse<List<OrderResponseDTO>> getOrdersForOneBranchByBranchId(String token) {
+    public ApiResponse<List<OrderResponseDTO>> getOrdersForOneBranchByBranchId(String token , String search) {
         Long branchId = jwtService.extractBranchId(token);
-        List<Order> orders = orderRepository.getOrdersByBranchId(branchId);
+        List<Order> orders = orderRepository.getOrdersByBranchId(branchId , search);
 
         List<OrderResponseDTO> dtoList = orderMapper.toDTOList(orders);
 
-        // تأكد من تصفير الـ pickupTime إذا لم يكن pre-order (اختياري حسب رغبتك)
         dtoList.forEach(order -> {
             if (order.getType() != OrderType.PRE_ORDER) {
                 order.setPickupTime(null);
@@ -144,4 +144,27 @@ public class OrderService {
 
         return ApiResponse.success("Orders Retrieved Successfully", dtoList);
     }
-}
+
+    // Set Order Status to PREPARING
+    public ApiResponse<String> changeStatusOfOrder(Long id , OrderStatus orderStatus){
+        Order order = orderRepository.findById(id).orElseThrow();
+        OrderStatus oldStatus = order.getStatus();
+        order.setStatus(orderStatus);
+        orderRepository.save(order);
+        String message = "Order status changed from " + oldStatus + " to " + orderStatus;
+        return ApiResponse.success(message, orderStatus.name());
+    }
+
+    public ApiResponse<List<OrderResponseDTO>> getOrdersForOneBranchByBranchIdAndStatusIsREADY(String token, String search) {
+        Long branchId = jwtService.extractBranchId(token);
+        List<Order> orders = orderRepository.searchOrdersByBranchIdAndReady(branchId, search);
+        List<OrderResponseDTO> dtoList = orderMapper.toDTOList(orders);
+//        dtoList.forEach(order -> {
+//            if (order.getType() != OrderType.PRE_ORDER) {
+//                order.setPickupTime(null);
+//            }
+//        });
+        return ApiResponse.success("Orders Ready Retrieved Successfully", dtoList);
+    }
+    }
+

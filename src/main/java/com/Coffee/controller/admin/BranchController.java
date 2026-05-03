@@ -3,6 +3,7 @@ package com.Coffee.controller.admin;
 import com.Coffee.dto.admin.request.BranchRequestDTO;
 import com.Coffee.dto.admin.response.BranchResponseDTO;
 import com.Coffee.dto.admin.response.BranchesOrder;
+import com.Coffee.dto.admin.response.CategoryResponseDTO;
 import com.Coffee.handler.ApiResponse;
 import com.Coffee.service.admin.BranchService;
 import jakarta.validation.Valid;
@@ -17,21 +18,26 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@PreAuthorize("hasRole('ADMIN')")
 @RequestMapping("/api/branch")
+@PreAuthorize("hasRole('ADMIN')")
 public class BranchController {
 
 @Autowired
     BranchService branchService;
 
     @GetMapping("")
-    public ApiResponse<List<BranchResponseDTO>> AllClubs(){
+    public ApiResponse<List<BranchResponseDTO>> AllBranches(){
         return ApiResponse.success("Branchs retrivied successfully",branchService.getAllBranches());
         // HttpStatus.OK
 
     }
 
+    // get 1 branch
+    @GetMapping("{branchId}")
+    public ApiResponse<BranchResponseDTO> getOneBranch(@PathVariable Long branchId){
 
+        return ApiResponse.success("Get Branch successfully",branchService.getBranchWithUsers(branchId)); // ,HttpStatus.OK
+    }
 
     @PostMapping(value = "")
     public ApiResponse<BranchResponseDTO> createBranch(@Valid  @RequestBody BranchRequestDTO branchRequestDTO) throws IOException {
@@ -39,13 +45,13 @@ public class BranchController {
         //, HttpStatus.CREATED
     }
 
-
+// update branch
     @PutMapping(value = "{branchId}")
     public ApiResponse<BranchResponseDTO> updateBranch(@PathVariable Long branchId,@Valid  @RequestBody BranchRequestDTO branchRequestDTO) throws IOException {
         return ApiResponse.success("Branch updated successfully", branchService.updateBranch(branchId,branchRequestDTO));
         //, HttpStatus.CREATED
     }
-
+// delete branch
     @DeleteMapping("{branchId}")
     public ApiResponse<String> deleteBranch(@PathVariable Long branchId) throws IOException {
         branchService.deleteBranch(branchId);

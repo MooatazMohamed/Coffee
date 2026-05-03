@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
@@ -14,6 +15,7 @@ import java.util.List;
 @Table(name = "branches")
 @Data
 @NoArgsConstructor
+@SQLRestriction("is_deleted = false")
 public class Branch {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.List;
 
 @Service
+@Transactional
 public class BranchService {
 
     @Autowired
@@ -37,7 +38,7 @@ public class BranchService {
     @Autowired
     private BranchRepository branchRepository;
 
-    @Transactional
+
     // get active branch
     public List<BranchResponseDTO> getAllBranches() {
     return branchRepository.findAll()
@@ -46,6 +47,12 @@ public class BranchService {
             .toList();
     }
 
+    public  BranchResponseDTO getBranchWithUsers(Long branchId){
+        Branch branch = branchRepository.findById(branchId).orElseThrow(()->new RuntimeException("Branch not found "));
+        BranchResponseDTO branchResponseDTO = branchMapper.branchEntitytoDto(branch);
+        return branchResponseDTO;
+
+    }
     // create branch method
     public BranchResponseDTO  createBranch(BranchRequestDTO branchRequestDTO){
 
@@ -81,15 +88,19 @@ public class BranchService {
     public BranchResponseDTO updateBranch(Long branchId,BranchRequestDTO branchRequestDTO) throws IOException {
     Branch branch = this.branchRepository.findById(branchId).orElseThrow(()-> new RuntimeException("Branch not found"));
 
-    Branch updateBranch = branchMapper.branchDtoToEntity(branchRequestDTO);
+   // Branch updateBranch = branchMapper.branchDtoToEntity(branchRequestDTO);
     //  this.branchMapper.branchDtoToEntity(clubRequestDTO,branch);
 
-    Branch saveClub =  this.branchRepository.save(updateBranch);
-    return this.branchMapper.branchEntitytoDto(saveClub);
+        branch.setName(branchRequestDTO.name());
+        branch.setAddress(branchRequestDTO.address());
+        branch.setPhone(branchRequestDTO.phone());
+
+        Branch saveBranch =  this.branchRepository.save(branch);
+    return this.branchMapper.branchEntitytoDto(saveBranch);
     }// end of update method
 
 
-    @Transactional  // because lazy in branch entity
+    //@Transactional  // because lazy in branch entity
     public  void deleteBranch(Long branchId) throws IOException {
         Branch branch = this.branchRepository.findById(branchId).orElseThrow(()-> new RuntimeException("Branch not found"));
 

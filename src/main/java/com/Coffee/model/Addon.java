@@ -3,6 +3,7 @@ package com.Coffee.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -25,7 +26,8 @@ public class Addon {
     @Column(name = "is_available")
     private Boolean isAvailable = true;
 
-    @ManyToMany(mappedBy = "addons", fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "addons", fetch = FetchType.LAZY   )
+    @ToString.Exclude  // <--- ADD THIS LINE to break the loop  because of log
     private List<Category> categories = new ArrayList<>();
 
     @ManyToMany(mappedBy = "addons", fetch = FetchType.LAZY)

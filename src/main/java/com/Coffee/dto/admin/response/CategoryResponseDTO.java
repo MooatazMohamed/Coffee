@@ -7,5 +7,6 @@ import java.util.List;
 public record CategoryResponseDTO(Long id,
                                   String name,
                                   String imageUrl,
-                                  List<AddonResponse> addonList) {
+                                  List<AddonResponse> addonList,
+                                  Boolean isDeleted) {
 }

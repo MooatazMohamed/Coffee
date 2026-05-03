@@ -19,6 +19,7 @@ public class OrderResponseDTO {
     private String orderNumber;
     private BigDecimal totalPrice;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
     private OrderType type;
     private OrderStatus status;
     private LocalDateTime pickupTime;

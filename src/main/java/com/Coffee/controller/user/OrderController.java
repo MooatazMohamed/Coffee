@@ -76,4 +76,11 @@ public class OrderController {
             @RequestParam(required = false) String search) {
         return orderService.getOrdersForOneBranchByBranchIdAndStatusIsREADY(token, search);
     }
+
+    @GetMapping("/getOrdersBranchCompleted")
+    public ApiResponse<List<OrderResponseDTO>> getCompletedOrders(
+            @RequestHeader("Authorization") String token,
+            @RequestParam(required = false) String search) {
+        return orderService.getOrdersForOneBranchByBranchIdAndStatusIsCOMPLETED(token, search);
+    }
 }

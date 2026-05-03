@@ -8,6 +8,7 @@ import com.Coffee.handler.ApiResponse;
 import com.Coffee.model.UserPrincipal;
 import com.Coffee.service.security.MyUserDetailsService;
 import com.Coffee.service.user.Impl.OrderService;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

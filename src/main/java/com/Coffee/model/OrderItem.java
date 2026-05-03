@@ -24,7 +24,7 @@ public class OrderItem {
     @JoinColumn(name = "order_id")
     private Order order;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "product_size_id")
     private ProductSize productSize;
 
@@ -36,7 +36,7 @@ public class OrderItem {
 
     private String notes;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "order_item_addons",
             joinColumns = @JoinColumn(name = "order_item_id"),

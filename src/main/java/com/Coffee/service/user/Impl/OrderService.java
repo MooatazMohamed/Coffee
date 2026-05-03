@@ -146,10 +146,12 @@ public class OrderService {
     }
 
     // Set Order Status to PREPARING
+    @Transactional
     public ApiResponse<String> changeStatusOfOrder(Long id , OrderStatus orderStatus){
         Order order = orderRepository.findById(id).orElseThrow();
         OrderStatus oldStatus = order.getStatus();
         order.setStatus(orderStatus);
+        order.setUpdatedAt(LocalDateTime.now());
         orderRepository.save(order);
         String message = "Order status changed from " + oldStatus + " to " + orderStatus;
         return ApiResponse.success(message, orderStatus.name());
@@ -165,6 +167,18 @@ public class OrderService {
 //            }
 //        });
         return ApiResponse.success("Orders Ready Retrieved Successfully", dtoList);
+    }
+
+    public ApiResponse<List<OrderResponseDTO>> getOrdersForOneBranchByBranchIdAndStatusIsCOMPLETED(String token, String search) {
+        Long branchId = jwtService.extractBranchId(token);
+        List<Order> orders = orderRepository.searchOrdersByBranchIdAndCompleted(branchId, search);
+        List<OrderResponseDTO> dtoList = orderMapper.toDTOList(orders);
+//        dtoList.forEach(order -> {
+//            if (order.getType() != OrderType.PRE_ORDER) {
+//                order.setPickupTime(null);
+//            }
+//        });
+        return ApiResponse.success("Orders Completed Retrieved Successfully", dtoList);
     }
     }
 

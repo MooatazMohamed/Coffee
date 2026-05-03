@@ -8,11 +8,12 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public record BranchResponseDTO(
+        Long id,
         String name,
         String address,
         String phone,
         Boolean isDeleted,
-        UserResponse branchAdmin,  // dto response [name , email , role]
-        Long id
+        UserResponse branchAdmin  // dto response [name , email , role]
+
 ) {
 }

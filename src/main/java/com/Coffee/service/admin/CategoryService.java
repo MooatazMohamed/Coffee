@@ -39,48 +39,48 @@ public class CategoryService {
         category.setName(categoryRequest.name());
         category.setImageUrl(categoryRequest.imageUrl());
 
-//        if (categoryRequest.addonIds()!= null && !categoryRequest.addonIds().isEmpty()) {
-//            // Fetch all addons by the provided IDs
-//            List<Addon> addons = addonRepository.findAllById(categoryRequest.addonIds());
-//
-//            // Set the relationship
-//            category.setAddons(addons);
-//
-//            // Important: In a bidirectional relationship, you usually update both sides
-//            // though for ManyToMany, updating the owning side (Category) is enough for the DB
-//            for (Addon addon : addons) {
-//                addon.getCategories().add(category);
-//            }
-//        }
+        if (categoryRequest.addonList()!= null && !categoryRequest.addonList().isEmpty()) {
+            // Fetch all addons by the provided IDs
+            List<Addon> addons = addonRepository.findAllById(categoryRequest.addonList());
 
-        List<Addon> addons = new ArrayList<>();
+            // Set the relationship
+            category.setAddons(addons);
 
-        if (categoryRequest.addonList() != null) {
-
-            for (AddonResponse addonDTO : categoryRequest.addonList()) {
-
-                Addon addon;
-
-                // ✅ لو فيه id → هاته من DB
-                if (addonDTO.getId() != null) {
-                    addon = addonRepository.findById(addonDTO.getId())
-                            .orElseThrow(() -> new RuntimeException("Addon not"+addonDTO.getName()+" found"));
-                }else{
-                    addon = new Addon();
-                    addon.setName(addonDTO.getName());
-                    addon.setPrice(addonDTO.getPrice());
-
-                }
-
-                addons.add(addon);
-
-
-                // maintain bidirectional relation
+            // Important: In a bidirectional relationship, you usually update both sides
+            // though for ManyToMany, updating the owning side (Category) is enough for the DB
+            for (Addon addon : addons) {
                 addon.getCategories().add(category);
             }
         }
 
-        category.setAddons(addons);
+//        List<Addon> addons = new ArrayList<>();
+//
+//        if (categoryRequest.addonList() != null) {
+//
+//            for (AddonResponse addonDTO : categoryRequest.addonList()) {
+//
+//                Addon addon;
+//
+//                // ✅ لو فيه id → هاته من DB
+//                if (addonDTO.getId() != null) {
+//                    addon = addonRepository.findById(addonDTO.getId())
+//                            .orElseThrow(() -> new RuntimeException("Addon not"+addonDTO.getName()+" found"));
+//                }else{
+//                    addon = new Addon();
+//                    addon.setName(addonDTO.getName());
+//                    addon.setPrice(addonDTO.getPrice());
+//
+//                }
+
+             //   addons.add(addon);
+
+
+                // maintain bidirectional relation
+              //  addon.getCategories().add(category);
+          //  }
+      //  }
+
+       // category.setAddons(addons);
 
         return mapToDTO(categoryRepository.save(category));
 
@@ -90,7 +90,7 @@ public class CategoryService {
     // update category addon method
     public CategoryResponseDTO updateCategoryWithAddons(  Long categoryId , CategoryRequestDTO categoryRequest) {
         Category category =  categoryRepository.findById(categoryId).orElseThrow(() -> new RuntimeException("Category not found"));
-        //        Optional<Category> category =  categoryRepository.findById(categoryId);
+//                Optional<Category> category =  categoryRepository.findById(categoryId);
 //      if( !category.isPresent() )
 //      {
 //          throw new RuntimeException("Category not  found");
@@ -102,26 +102,17 @@ public class CategoryService {
 
         if (categoryRequest.addonList() != null) {
 
-            for (AddonResponse addonDTO : categoryRequest.addonList()) {
+            for (Long addonID : categoryRequest.addonList()) {
 
                 Addon addon;
 
-                // ✅ لو فيه id → هاته من DB
-                if (addonDTO.getId() != null) {
-                    addon = addonRepository.findById(addonDTO.getId())
-                            .orElseThrow(() -> new RuntimeException("Addon not"+addonDTO.getName()+" found"));
-                }else{
-                    addon = new Addon();
-                    addon.setName(addonDTO.getName());
-                    addon.setPrice(addonDTO.getPrice());
-
-                }
-
-                addons.add(addon);
+                    addon = addonRepository.findById(addonID)
+                            .orElseThrow(() -> new RuntimeException("Addon not found"));
+                    addons.add(addon);
+                    // maintain bidirectional relation
+                    addon.getCategories().add(category);
 
 
-                // maintain bidirectional relation
-                addon.getCategories().add(category);
             }
         }
 

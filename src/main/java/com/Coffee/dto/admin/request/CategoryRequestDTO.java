@@ -14,5 +14,5 @@ public record CategoryRequestDTO(
         String name,
         String imageUrl,
         @NotEmpty(message = "At least one addon must be selected")
-        List<AddonResponse> addonList) {
+        List<Long> addonList) {
 }

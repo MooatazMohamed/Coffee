@@ -15,7 +15,7 @@ import java.util.List;
 @Table(name = "products")
 @Data
 @NoArgsConstructor
-@SQLRestriction("is_deleted = false")
+//@SQLRestriction("is_deleted = false")
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

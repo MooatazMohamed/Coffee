@@ -12,21 +12,17 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     List<Order> findByUserIdAndIsDeletedFalseOrderByCreatedAtDesc(Long userId);
 
-    @Query("""
-    SELECT o FROM Order o
-    LEFT JOIN o.orderItems oi
-    LEFT JOIN oi.productSize ps
-    LEFT JOIN ps.product p
-    LEFT JOIN oi.addons a
-    WHERE o.branch.id = :branchId
-    AND o.isDeleted = false
-    AND (o.status = com.Coffee.enums.OrderStatus.PENDING
-                     OR o.status = com.Coffee.enums.OrderStatus.PREPARING)
-    AND(:search IS NULL OR :search = ''
-        OR LOWER(o.orderNumber) LIKE LOWER(CONCAT('%' , :search , '%'))
-        OR CAST(o.id AS string) LIKE CONCAT('%' , :search , '%')
-    )
-""")
+    @Query(""" 
+            SELECT o FROM Order o 
+            LEFT JOIN o.orderItems oi 
+            LEFT JOIN oi.productSize ps 
+            LEFT JOIN ps.product p 
+            LEFT JOIN oi.addons a 
+            WHERE o.branch.id = :branchId 
+            AND o.isDeleted = false AND 
+            (o.status = com.Coffee.enums.OrderStatus.PENDING OR o.status = com.Coffee.enums.OrderStatus.PREPARING) 
+            AND(:search IS NULL OR :search = '' OR LOWER(o.orderNumber) LIKE LOWER(CONCAT('%' , :search , '%')) 
+            OR CAST(o.id AS string) LIKE CONCAT('%' , :search , '%') ) """)
     List<Order> getOrdersByBranchId(Long branchId , String search);
 
     @Query("""

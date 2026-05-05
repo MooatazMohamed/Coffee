@@ -29,8 +29,10 @@ public class AddonController {
     }
 
     @GetMapping("")
-    public ResponseEntity<ApiResponse<List<AddonResponse>>> getAll(){
-        return ResponseEntity.ok(addonServices.getAll());
+    public ResponseEntity<ApiResponse<List<AddonResponse>>> getAndSearchAddons(
+            @RequestParam(required = false) String search) {
+
+        return ResponseEntity.ok(addonServices.getAndSearchAddons(search));
     }
 
     @DeleteMapping("/{id}")

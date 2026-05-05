@@ -16,9 +16,9 @@ public class StaffServices {
         this.staffRepository=staffRepository;
     }
 
-    public ApiResponse<List<StaffResponse>> getAllStaff(){
+    public ApiResponse<List<StaffResponse>> getAllStaff(String search){
         return ApiResponse.success("Data Retrieved Successfully",
-                staffRepository.getStaff());
+                staffRepository.getStaff(search));
     }
 
 }

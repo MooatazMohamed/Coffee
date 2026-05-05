@@ -15,7 +15,7 @@ import org.hibernate.annotations.SQLRestriction;
 @Table(name = "categories")
 @Data
 @NoArgsConstructor
-@SQLRestriction("is_deleted = false")
+//@SQLRestriction("is_deleted = false")
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

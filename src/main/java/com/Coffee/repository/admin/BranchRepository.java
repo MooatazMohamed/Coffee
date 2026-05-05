@@ -49,4 +49,15 @@ AND (
             @Param("branchId") Long branchId,
             @Param("search") String search
     );
+
+    // ─── Dashboard Metrics Queries ─────────────────────────────
+
+    /**
+     * Get count of active (non-deleted) branches
+     */
+    @Query("""
+    SELECT COUNT(b) FROM Branch b
+    WHERE b.isDeleted = false
+""")
+    Long getActiveBranchesCount();
 }

@@ -14,11 +14,15 @@ import com.Coffee.repository.admin.BranchRepository;
 import com.Coffee.repository.user.RoleRepository;
 import com.Coffee.repository.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -114,11 +118,12 @@ public class BranchService {
     } // end of deleted branch
 
 
-    public ApiResponse<List<BranchesOrder>> getAllOrdersForAllBranches(Long branchId, String search){
-        return ApiResponse.success(
-                "Data Retrieved Success",
-                branchRepository.getAllOrdersForAllBranches(branchId, search)
-        );
+    public ApiResponse<Page<BranchesOrder>> getAllOrdersForAllBranches(
+            Long branchId, String search, LocalDate date , int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<BranchesOrder> ordersPage = branchRepository
+                .getAllOrdersForAllBranches(branchId, search, date , pageable);
+        return ApiResponse.success("Data Retrieved Success", ordersPage);
     }
 
 

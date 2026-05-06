@@ -1,5 +1,6 @@
 package com.Coffee.service.user.Impl;
 
+import com.Coffee.dto.manager.response.OrderItemDTO;
 import com.Coffee.dto.manager.response.OrderResponseDTO;
 import com.Coffee.dto.user.request.OrderItemAddonRequest;
 import com.Coffee.dto.user.request.OrderItemRequest;
@@ -24,8 +25,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -129,20 +129,17 @@ public class OrderService {
 
 
     //Get Orders For One Branch MANAGER
-    public ApiResponse<List<OrderResponseDTO>> getOrdersForOneBranchByBranchId(String token , String search) {
-        Long branchId = jwtService.extractBranchId(token);
+    public ApiResponse<List<OrderResponseDTO>> getOrdersForOneBranchByBranchId(String token , String search)
+    { Long branchId = jwtService.extractBranchId(token);
         List<Order> orders = orderRepository.getOrdersByBranchId(branchId , search);
-
         List<OrderResponseDTO> dtoList = orderMapper.toDTOList(orders);
-
         dtoList.forEach(order -> {
-            if (order.getType() != OrderType.PRE_ORDER) {
-                order.setPickupTime(null);
-            }
+            if (order.getType() != OrderType.PRE_ORDER)
+        {
+            order.setPickupTime(null); }
         });
-
-        return ApiResponse.success("Orders Retrieved Successfully", dtoList);
-    }
+        System.out.println(dtoList);
+        return ApiResponse.success("Orders Retrieved Successfully", dtoList); }
 
     // Set Order Status to PREPARING
     @Transactional

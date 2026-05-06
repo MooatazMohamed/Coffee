@@ -15,7 +15,7 @@ import java.util.List;
 @Table(name = "branches")
 @Data
 @NoArgsConstructor
-@SQLRestriction("is_deleted = false")
+//@SQLRestriction("is_deleted = false")
 public class Branch {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

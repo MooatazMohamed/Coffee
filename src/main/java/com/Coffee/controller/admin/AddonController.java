@@ -36,6 +36,13 @@ public class AddonController {
         return ResponseEntity.ok(addonServices.save(addonRequest));
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<List<AddonResponse>>> getAndSearchAddons(
+            @RequestParam(required = false) String search) {
+
+        return ResponseEntity.ok(addonServices.getAndSearchAddons(search));
+    }
+
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id){

@@ -8,6 +8,8 @@ import com.Coffee.handler.ApiResponse;
 import com.Coffee.service.admin.BranchService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +17,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -59,12 +62,15 @@ public class BranchController {
     }
 
     @GetMapping("/allOrdersBranches")
-    public ResponseEntity<ApiResponse<List<BranchesOrder>>> getAllOrdersForAllBranches(
+    public ResponseEntity<ApiResponse<Page<BranchesOrder>>> getAllOrdersForAllBranches(
             @RequestParam(required = false) Long branchId,
-            @RequestParam(required = false) String search
-    ){
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
         return ResponseEntity.ok(
-                branchService.getAllOrdersForAllBranches(branchId, search)
+                branchService.getAllOrdersForAllBranches(branchId, search, date , page, size)
         );
     }
 }

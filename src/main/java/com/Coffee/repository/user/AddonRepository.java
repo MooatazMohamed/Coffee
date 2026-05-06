@@ -1,5 +1,6 @@
 package com.Coffee.repository.user;
 
+import com.Coffee.dto.admin.response.AddonResponse;
 import com.Coffee.model.Addon;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -19,6 +20,17 @@ public interface AddonRepository extends JpaRepository<Addon, Long> {
     List<Addon> findAddonsByCategoryId(@Param("categoryId") Long categoryId);
 
     List<Addon> findByIdInAndIsAvailableTrueAndIsDeletedFalse(List<Long> ids);
+
+    @Query("""
+SELECT DISTINCT a
+FROM Addon a
+WHERE a.isDeleted = false
+AND (
+    :search IS NULL OR
+    LOWER(a.name) LIKE LOWER(CONCAT('%', :search, '%'))
+)
+""")
+    List<Addon> getAndSearchAddons(@Param("search") String search);
 
     List<Addon> findByIsDeletedFalse();
 }

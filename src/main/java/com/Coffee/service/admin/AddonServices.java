@@ -33,10 +33,14 @@ public class AddonServices {
 
 
     //GET
-    public ApiResponse<List<AddonResponse>> getAll(){
-
-        return ApiResponse.success("Data Retrieved Successfully",
-                addonMapper.toResponseList(addonRepository.findByIsDeletedFalse())
+    public ApiResponse<List<AddonResponse>> getAndSearchAddons(String search) {
+        if (search != null && search.trim().isEmpty()) {
+            search = null;
+        }
+        List<Addon> addons = addonRepository.getAndSearchAddons(search);
+        return ApiResponse.success(
+                "Addon Retrieved Successfully",
+                addonMapper.toResponseList(addons)
         );
     }
 
@@ -73,6 +77,14 @@ public class AddonServices {
         return ApiResponse.success(
                 "Addon Updated Successfully",
                 addonMapper.toResponse(saved)
+        );
+    }
+
+    //GET
+    public ApiResponse<List<AddonResponse>> getAll(){
+
+        return ApiResponse.success("Data Retrieved Successfully",
+                addonMapper.toResponseList(addonRepository.findByIsDeletedFalse())
         );
     }
 }

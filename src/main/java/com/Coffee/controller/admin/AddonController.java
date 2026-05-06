@@ -12,16 +12,24 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@PreAuthorize("hasRole('ADMIN')")
 @RequestMapping("/api/addon")
 public class AddonController {
 
     private final AddonServices addonServices;
+
     public AddonController(AddonServices addonServices) {
         this.addonServices = addonServices;
     }
 
+    // Public endpoint - anyone can access
+    @GetMapping("")
+    public ResponseEntity<ApiResponse<List<AddonResponse>>> getAll(){
+        return ResponseEntity.ok(addonServices.getAll());
+    }
+
+    // Admin only endpoints
     @PostMapping("")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<AddonResponse>> save(
             @RequestBody @Valid AddonRequest addonRequest
     ) {
@@ -36,11 +44,13 @@ public class AddonController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id){
         return ResponseEntity.ok(addonServices.delete(id));
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<AddonResponse>> update(
             @PathVariable Long id,
             @RequestBody @Valid AddonRequest request

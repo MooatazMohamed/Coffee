@@ -36,9 +36,12 @@ public class CategoryController {
     }
     // create category
     @PostMapping("")
-    public ResponseEntity<CategoryResponseDTO> createCategory(@Valid @RequestBody CategoryRequestDTO request) {
+    public ApiResponse<CategoryResponseDTO>  createCategory(@Valid @RequestBody CategoryRequestDTO request) {
         CategoryResponseDTO savedCategory = categoryService.createCategoryWithAddons(request);
-        return ResponseEntity.ok(savedCategory);
+        return ApiResponse.success("Category Created successfully",savedCategory); // ,HttpStatus.OK
+
+
+
     }
     // update category
     @PutMapping(value = "{categoryId}")

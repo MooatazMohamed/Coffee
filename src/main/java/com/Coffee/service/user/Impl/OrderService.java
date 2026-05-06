@@ -10,13 +10,13 @@ import com.Coffee.enums.OrderStatus;
 import com.Coffee.enums.OrderType;
 import com.Coffee.handler.ApiResponse;
 import com.Coffee.handler.ResourceNotFoundException;
-import com.Coffee.mapper.admin.AddonMapper;
-import com.Coffee.mapper.user.OrderItemMapper;
 import com.Coffee.mapper.user.OrderMapper;
 import com.Coffee.model.*;
-//import com.Coffee.repository.user.*;
 import com.Coffee.repository.admin.BranchRepository;
-import com.Coffee.repository.user.*;
+import com.Coffee.repository.user.OrderRepository;
+import com.Coffee.repository.user.ProductSizeRepository;
+import com.Coffee.repository.user.AddonRepository;
+import com.Coffee.repository.user.UserRepository;
 import com.Coffee.service.security.JWTService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -31,14 +31,11 @@ import java.util.*;
 @RequiredArgsConstructor
 public class OrderService {
     private final OrderRepository orderRepository;
-    private final OrderItemRepository orderItemRepository;
     private final ProductSizeRepository productSizeRepository;
     private final AddonRepository addonRepository;
     private final BranchRepository branchRepository;
     private final UserRepository userRepository;
     private final OrderMapper orderMapper;
-    private final OrderItemMapper orderItemMapper;
-    private final AddonMapper addonMapper;
     private final JWTService jwtService;
 
     @Transactional
@@ -55,7 +52,10 @@ public class OrderService {
         order.setBranch(branch);
         order.setStatus(OrderStatus.PENDING);
         //XXX
-        order.setType(OrderType.ORDER_NOW);
+        OrderType orderType = request.getType() != null
+                ? OrderType.valueOf(request.getType())
+                : OrderType.ORDER_NOW;
+        order.setType(orderType);
         //XXX
         order.setNotes(request.getNotes());
         order.setCreatedAt(LocalDateTime.now());

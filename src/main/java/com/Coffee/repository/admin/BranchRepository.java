@@ -55,4 +55,15 @@ AND (:date IS NULL OR DATE(o.createdAt) = :date)
             @Param("date") LocalDate date,
             Pageable pageable
     );
+
+    // ─── Dashboard Metrics Queries ─────────────────────────────
+
+    /**
+     * Get count of active (non-deleted) branches
+     */
+    @Query("""
+    SELECT COUNT(b) FROM Branch b
+    WHERE b.isDeleted = false
+""")
+    Long getActiveBranchesCount();
 }

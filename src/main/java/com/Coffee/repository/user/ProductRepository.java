@@ -31,4 +31,15 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Optional<Product> findByIdAndAvailable(@Param("id") Long id);
 
     List<Product> findTop8ByIsAvailableTrueAndIsDeletedFalseOrderByCreatedAtDesc();
+
+    // ─── Dashboard Metrics Queries ─────────────────────────────
+
+    /**
+     * Get count of total products (all products, including unavailable)
+     */
+    @Query("""
+    SELECT COUNT(p) FROM Product p
+    WHERE p.isDeleted = false
+""")
+    Long getTotalProductsCount();
 }

@@ -13,6 +13,8 @@ public class PlaceOrderRequest {
     @NotNull(message = "Branch is required")
     private Long branchId;
 
+    private String type; // ORDER_NOW or PRE_ORDER
+
     private String notes;
 
     @NotEmpty(message = "Order must have at least one item")

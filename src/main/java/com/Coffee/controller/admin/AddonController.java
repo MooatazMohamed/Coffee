@@ -36,7 +36,7 @@ public class AddonController {
         return ResponseEntity.ok(addonServices.save(addonRequest));
     }
 
-    @GetMapping("")
+    @GetMapping("/search")
     public ResponseEntity<ApiResponse<List<AddonResponse>>> getAndSearchAddons(
             @RequestParam(required = false) String search) {
 

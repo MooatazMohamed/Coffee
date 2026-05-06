@@ -79,4 +79,12 @@ public class AddonServices {
                 addonMapper.toResponse(saved)
         );
     }
+
+    //GET
+    public ApiResponse<List<AddonResponse>> getAll(){
+
+        return ApiResponse.success("Data Retrieved Successfully",
+                addonMapper.toResponseList(addonRepository.findByIsDeletedFalse())
+        );
+    }
 }

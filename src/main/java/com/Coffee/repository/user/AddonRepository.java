@@ -31,4 +31,6 @@ AND (
 )
 """)
     List<Addon> getAndSearchAddons(@Param("search") String search);
+
+    List<Addon> findByIsDeletedFalse();
 }

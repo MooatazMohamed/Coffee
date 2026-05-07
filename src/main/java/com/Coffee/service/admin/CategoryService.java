@@ -140,7 +140,12 @@ public class CategoryService {
         if(category.getIsDeleted() == true){
             throw new RuntimeException("This Category Already deleted");
         }
-    category.setIsDeleted(true);
+long productCount = category.getProducts().stream().count();
+       // log.info("category products{} ", productCount);
+        if(productCount > 0){
+            throw new RuntimeException("Should not delete Category Contain Products ");
+        }
+        category.setIsDeleted(true);
     this.categoryRepository.save(category);
 
 } // end of deleted category

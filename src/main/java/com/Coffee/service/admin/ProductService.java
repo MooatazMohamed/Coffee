@@ -103,7 +103,9 @@ Product product = productRepository.findById(productId).orElseThrow(  ()-> new R
         if(product.getIsDeleted() == true){
             throw new RuntimeException("This Product Already deleted");
         }
+        
         product.setIsDeleted(true);
+        this.imageHelper.deleteImage(product.getImageUrl());
         this.productRepository.save(product);
 
     } // end of deleted category

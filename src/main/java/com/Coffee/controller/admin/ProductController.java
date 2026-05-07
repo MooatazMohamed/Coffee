@@ -9,6 +9,7 @@ import com.Coffee.model.Branch;
 import com.Coffee.service.admin.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,14 +36,14 @@ public class ProductController {
         //, HttpStatus.CREATED
     }
     // create product
-    @PostMapping
-    public ApiResponse<ProductResponseDTO> createProduct(@Valid @RequestBody ProductRequestDTO productRequestDTO) throws IOException {
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<ProductResponseDTO> createProduct(@Valid @ModelAttribute ProductRequestDTO productRequestDTO) throws IOException {
         return ApiResponse.success("Product created successfully", productService.createProduct(productRequestDTO));
         //, HttpStatus.CREATED
     }
 // update product
-    @PutMapping(value = "{productId}")
-    public ApiResponse<ProductResponseDTO> updateProduct(@PathVariable Long productId, @Valid  @RequestBody ProductRequestDTO productRequestDTO) throws IOException {
+    @PutMapping(value = "{productId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<ProductResponseDTO> updateProduct(@PathVariable Long productId, @Valid   @ModelAttribute ProductRequestDTO productRequestDTO) throws IOException {
         return ApiResponse.success("Product updated successfully", productService.updateProduct(productId,productRequestDTO));
         //, HttpStatus.CREATED
     }

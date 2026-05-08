@@ -1,11 +1,9 @@
 package com.Coffee.service.admin;
 
-import com.Coffee.dto.admin.request.BranchRequestDTO;
 import com.Coffee.dto.admin.request.ProductRequestDTO;
-import com.Coffee.dto.admin.response.BranchResponseDTO;
 import com.Coffee.dto.admin.response.ProductResponseDTO;
+import com.Coffee.helper.ImageHelper;
 import com.Coffee.mapper.admin.AdminProductMapper;
-import com.Coffee.model.Branch;
 import com.Coffee.model.Category;
 import com.Coffee.model.Product;
 import com.Coffee.model.ProductSize;
@@ -26,7 +24,8 @@ public class ProductService {
     AdminProductMapper adminProductMapper;
     @Autowired
     ProductRepository productRepository;
-
+    @Autowired
+    private ImageHelper imageHelper;
     // get all products
     public List<ProductResponseDTO> getAllProduct( ){
 
@@ -37,8 +36,9 @@ public class ProductService {
     // get one product
     public ProductResponseDTO getOneProduct( Long productId ){
 Product product = productRepository.findById(productId).orElseThrow(  ()-> new RuntimeException("Product not Found"));
-
+        log.info("product : {}", product.getImageUrl());
         ProductResponseDTO productDTO = adminProductMapper.toResponse(product);
+
        return productDTO;
 
     }
@@ -48,6 +48,12 @@ Product product = productRepository.findById(productId).orElseThrow(  ()-> new R
         Product product = adminProductMapper.productDtoToEntity(productRequestDTO);
         if (product.getProductSizes() != null) {
             product.getProductSizes().forEach(size -> size.setProduct(product));
+        }
+        try {
+            String imageName = this.imageHelper.getImageOrDefault(productRequestDTO.imageUrl(),"Products");
+            product.setImageUrl(imageName);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to process product image", e);
         }
         ProductResponseDTO productResponseDTO  = adminProductMapper.toResponse(productRepository.save(product)) ;
 
@@ -59,12 +65,17 @@ Product product = productRepository.findById(productId).orElseThrow(  ()-> new R
         Product product = this.productRepository.findById(productId).orElseThrow(()-> new RuntimeException("Product not found"));
         product.setName(productRequestDTO.name());
         product.setDescription(productRequestDTO.description());
-        product.setImageUrl(productRequestDTO.imageUrl());
+      //  product.setImageUrl(productRequestDTO.imageUrl());
         // convert dto to entity
        Category category = new Category();
         category.setId(productRequestDTO.category().id());
         category.setName(productRequestDTO.category().name());
         product.setCategory(category);
+        if (productRequestDTO.imageUrl() != null    && !productRequestDTO.imageUrl().isEmpty()) {
+            this.imageHelper.deleteImage(product.getImageUrl());
+            String image = this.imageHelper.getImageOrDefault(productRequestDTO.imageUrl(),"Products");
+            product.setImageUrl(image);
+        }
        // product.setProductSizes(productRequestDTO.productSizes());
 // 1. Clear the old sizes (orphanRemoval = true will delete them from DB)
         product.getProductSizes().clear();
@@ -81,7 +92,7 @@ Product product = productRepository.findById(productId).orElseThrow(  ()-> new R
                 product.getProductSizes().add(productSize);
             });
         }
-        log.debug("products : {}",product);
+      //  log.debug("products : {}",product);
         ProductResponseDTO productResponseDTO  = adminProductMapper.toResponse(productRepository.save(product)) ;
         return productResponseDTO;
     }// end of update method
@@ -92,7 +103,9 @@ Product product = productRepository.findById(productId).orElseThrow(  ()-> new R
         if(product.getIsDeleted() == true){
             throw new RuntimeException("This Product Already deleted");
         }
+        
         product.setIsDeleted(true);
+        this.imageHelper.deleteImage(product.getImageUrl());
         this.productRepository.save(product);
 
     } // end of deleted category

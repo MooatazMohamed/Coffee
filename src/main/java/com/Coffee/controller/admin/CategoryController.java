@@ -24,8 +24,8 @@ public class CategoryController {
 
     // get All category
     @GetMapping("")
-    public List<CategoryResponseDTO> getAllCategory() {
-        return   categoryService.getAllCategoryWithAddons();
+    public ApiResponse<List<CategoryResponseDTO>> getAllCategory() {
+        return ApiResponse.success("Get Categories successfully", categoryService.getAllCategoryWithAddons());
     }
 
     // get 1 category

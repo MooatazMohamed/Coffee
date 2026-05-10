@@ -22,13 +22,11 @@ public interface AddonRepository extends JpaRepository<Addon, Long> {
     List<Addon> findByIdInAndIsAvailableTrueAndIsDeletedFalse(List<Long> ids);
 
     @Query("""
-SELECT DISTINCT a
-FROM Addon a
-WHERE a.isDeleted = false
-AND (
-    :search IS NULL OR
-    LOWER(a.name) LIKE LOWER(CONCAT('%', :search, '%'))
-)
+    SELECT DISTINCT a
+    FROM Addon a
+    LEFT JOIN FETCH a.categories
+    WHERE a.isDeleted = false
+    AND ( :search IS NULL OR LOWER(a.name) LIKE LOWER(CONCAT('%', :search, '%')) )
 """)
     List<Addon> getAndSearchAddons(@Param("search") String search);
 

@@ -35,13 +35,11 @@ public class AddonServices {
     //GET
     public ApiResponse<List<AddonResponse>> getAndSearchAddons(String search) {
         if (search != null && search.trim().isEmpty()) {
-            search = null;
+            search = "";
         }
         List<Addon> addons = addonRepository.getAndSearchAddons(search);
-        return ApiResponse.success(
-                "Addon Retrieved Successfully",
-                addonMapper.toResponseList(addons)
-        );
+        return ApiResponse.success("Addon Retrieved Successfully",
+                addonMapper.toResponseList(addons));
     }
 
     //Delete

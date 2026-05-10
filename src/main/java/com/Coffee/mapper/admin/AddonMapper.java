@@ -15,4 +15,5 @@ public interface AddonMapper {
     AddonResponse toResponse(Addon addon);
 
     List<AddonResponse> toResponseList(List<Addon> addons);
+
 }

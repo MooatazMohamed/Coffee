@@ -10,6 +10,10 @@ import com.Coffee.model.ProductSize;
 import com.Coffee.repository.user.ProductRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,10 +30,31 @@ public class ProductService {
     ProductRepository productRepository;
     @Autowired
     private ImageHelper imageHelper;
+
+    // get all product
     // get all products
     public List<ProductResponseDTO> getAllProduct( ){
 
         return productRepository.findAll().stream().map(productEntity ->adminProductMapper.toResponse(productEntity)).toList();
+
+    }
+    // get all products with pagination
+    public Page<ProductResponseDTO> getAllProductWithPagination(
+            int pageNumber, int pageSize, String sortBy, String sortDir){
+
+        // Create Sort object based on sortBy and sortDir parameters
+        Sort sort = sortDir.equalsIgnoreCase("desc")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
+        // Create Pageable object with page number, page size, and sorting
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
+        // Fetch paginated and sorted contacts from repository
+        Page<Product> productPage = productRepository.findAll(pageable);
+
+        Page<ProductResponseDTO> responseDtoPage = productPage.map(productEntity ->adminProductMapper.toResponse(productEntity));
+
+
+        return responseDtoPage;
 
     }
 

@@ -90,11 +90,13 @@ Product product = productRepository.findById(productId).orElseThrow(  ()-> new R
         Product product = this.productRepository.findById(productId).orElseThrow(()-> new RuntimeException("Product not found"));
         product.setName(productRequestDTO.name());
         product.setDescription(productRequestDTO.description());
+        product.setIsAvailable(productRequestDTO.isAvailable() != null ? productRequestDTO.isAvailable() : true);
       //  product.setImageUrl(productRequestDTO.imageUrl());
         // convert dto to entity
-       Category category = new Category();
+        Category category = new Category();
         category.setId(productRequestDTO.category().id());
         category.setName(productRequestDTO.category().name());
+        product.setCategory(category);
         product.setCategory(category);
         if (productRequestDTO.imageUrl() != null    && !productRequestDTO.imageUrl().isEmpty()) {
             this.imageHelper.deleteImage(product.getImageUrl());

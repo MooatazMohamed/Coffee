@@ -73,4 +73,14 @@ public class BranchController {
                 branchService.getAllOrdersForAllBranches(branchId, search, date , page, size)
         );
     }
+
+    @GetMapping("/my-branch")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    public ApiResponse<BranchResponseDTO> getMyBranch(){
+
+        return ApiResponse.success(
+                "Get Branch successfully",
+                branchService.getBranchWithUsers(null)
+        );
+    }
 }

@@ -55,4 +55,8 @@ public class UserPrincipal implements UserDetails {
     public Long getId() {
         return user.getId();
     }
+
+    public Long getBranchId() {
+        return user.getBranch().getId();
+    }
 }

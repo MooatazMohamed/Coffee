@@ -10,13 +10,17 @@ import com.Coffee.mapper.user.UserMapper;
 import com.Coffee.model.Branch;
 import com.Coffee.model.Role;
 import com.Coffee.model.User;
+import com.Coffee.model.UserPrincipal;
 import com.Coffee.repository.admin.BranchRepository;
 import com.Coffee.repository.user.RoleRepository;
 import com.Coffee.repository.user.UserRepository;
+import com.Coffee.service.security.MyUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,11 +55,36 @@ public class BranchService {
             .toList();
     }
 
-    public  BranchResponseDTO getBranchWithUsers(Long branchId){
-        Branch branch = branchRepository.findById(branchId).orElseThrow(()->new RuntimeException("Branch not found "));
-        BranchResponseDTO branchResponseDTO = branchMapper.branchEntitytoDto(branch);
-        return branchResponseDTO;
+    public BranchResponseDTO getBranchWithUsers(Long branchId) {
 
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        UserPrincipal user =
+                (UserPrincipal) authentication.getPrincipal();
+
+        boolean isManager = authentication.getAuthorities()
+                .stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_MANAGER"));
+
+        Branch branch;
+
+        if (isManager) {
+
+            Long managerBranchId = user.getBranchId();
+
+            branch = branchRepository.findById(managerBranchId)
+                    .orElseThrow(() -> new RuntimeException("Branch not found"));
+
+        } else {
+            if (branchId == null) {
+                throw new RuntimeException("branchId is required for ADMIN");
+            }
+            branch = branchRepository.findById(branchId)
+                    .orElseThrow(() -> new RuntimeException("Branch not found"));
+        }
+
+        return branchMapper.branchEntitytoDto(branch);
     }
     // create branch method
     public BranchResponseDTO  createBranch(BranchRequestDTO branchRequestDTO){

@@ -47,4 +47,15 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<?>> logout(@RequestHeader(value = "Authorization", required = false) String authHeader){
+        ApiResponse<?> response = userService.logout(authHeader);
+
+        if(!response.isSuccess()){
+            return ResponseEntity.status(401).body(response);
+        }
+
+        return ResponseEntity.ok(response);
+    }
+
 }

@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Date;
 
 @Service
 public class UserService {
@@ -26,6 +27,9 @@ public class UserService {
 
     @Autowired
     private JWTService jwtService;
+
+    @Autowired
+    private TokenBlacklistService tokenBlacklistService;
 
     @Autowired
     private UserMapper userMapper;
@@ -74,5 +78,24 @@ public class UserService {
         data.put("token", token);
 
         return ApiResponse.success("Login successful", data);
+    }
+
+    public ApiResponse<?> logout(String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ApiResponse.error("Logout failed", "Missing or invalid Authorization header");
+        }
+
+        String token = authHeader.substring(7).trim();
+
+        try {
+            Date expiration = jwtService.extractExpiration(token);
+            tokenBlacklistService.revokeToken(token, expiration);
+
+            Map<String, Boolean> data = new HashMap<>();
+            data.put("loggedOut", true);
+            return ApiResponse.success("Logout successful", data);
+        } catch (Exception e) {
+            return ApiResponse.error("Logout failed", "Invalid token");
+        }
     }
 }

@@ -4,6 +4,7 @@ package com.Coffee.config;
 
 import com.Coffee.service.security.JWTService;
 import com.Coffee.service.security.MyUserDetailsService;
+import com.Coffee.service.security.TokenBlacklistService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,6 +29,9 @@ public class JwtFilter extends OncePerRequestFilter {
     @Autowired
     private ApplicationContext applicationContext;
 
+    @Autowired
+    private TokenBlacklistService tokenBlacklistService;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String authHeader = request.getHeader("Authorization");
@@ -36,6 +40,13 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if(authHeader != null && authHeader.startsWith("Bearer ")){
             token = authHeader.substring(7);
+
+            if (tokenBlacklistService.isTokenRevoked(token)) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json");
+                response.getWriter().write("{\"message\": \"Token has been logged out\"}");
+                return;
+            }
 
             try {
                 userName = jwtService.extractUserName(token);

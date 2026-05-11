@@ -21,7 +21,8 @@ public class PublicProductController {
 
     @GetMapping("")
     public ApiResponse<List<ProductResponseDTO>> getAllProducts() {
-        return ApiResponse.success("Products retrieved successfully", productService.getAllProduct());
+
+        return ApiResponse.success("Products retrieved successfully",productService.getAllProduct());
     }
 
     @GetMapping(value = "/{productId}")

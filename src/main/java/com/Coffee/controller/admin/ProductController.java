@@ -9,7 +9,10 @@ import com.Coffee.model.Branch;
 import com.Coffee.service.admin.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,12 +26,27 @@ public class ProductController {
     @Autowired
     ProductService productService ;
 
-    @GetMapping("")
-    public ApiResponse<List<ProductResponseDTO>> AllBranches(){
+    @GetMapping("/all")
+    public ApiResponse<List<ProductResponseDTO>> AllProducts(){
         return ApiResponse.success("Products retrivied successfully",productService.getAllProduct());
         // HttpStatus.OK
 
     }
+
+    //get products with pagenation
+    @GetMapping("")
+    public ApiResponse<Page<ProductResponseDTO>> AllProducts ( @RequestParam(defaultValue = "0") int pageNumber,
+    @RequestParam(defaultValue = "10") int pageSize,
+    @RequestParam(defaultValue = "createdAt") String sortBy,
+    @RequestParam(defaultValue = "des") String sortDir){
+        Page<ProductResponseDTO> productResponseDtoPage = productService
+                .getAllProductWithPagination(pageNumber, pageSize, sortBy, sortDir);
+
+        return ApiResponse.success("Products retrivied successfully",productResponseDtoPage);
+        // HttpStatus.OK
+
+    }
+
     // get one product
     @GetMapping(value = "{productId}")
     public ApiResponse<ProductResponseDTO> getProduct(@PathVariable Long productId) throws IOException {

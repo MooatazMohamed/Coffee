@@ -1,6 +1,6 @@
 package com.Coffee.repository.admin;
 
-import com.Coffee.dto.admin.response.BranchesOrder;
+import com.Coffee.dto.admin.response.BranchesOrderView;
 import com.Coffee.model.Branch;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,30 +26,42 @@ public interface BranchRepository extends JpaRepository<Branch,Long> {
 
     // List<Branch> findByIsDeletedFalse();
 
-    @Query("""
-SELECT new com.Coffee.dto.admin.response.BranchesOrder(
-    o.orderNumber,
-    u.name,
-    b.name,
-    o.totalPrice,
-    o.type,
-    o.createdAt,
-    b.id,
-    o.status
-)
-FROM com.Coffee.model.Order o
-LEFT JOIN o.user u
-LEFT JOIN o.branch b
+    @Query(value = """
+SELECT o.order_number as orderNumber,
+       u.name as userName,
+       b.name as branchName,
+       o.total_price as totalPrice,
+       o.type as type,
+       o.created_at as createdAt,
+       b.id as branchId,
+       o.status as status
+FROM orders o
+LEFT JOIN users u ON u.id = o.user_id
+LEFT JOIN branches b ON b.id = o.branch_id
 WHERE (:branchId IS NULL OR b.id = :branchId)
 AND (
     :search IS NULL OR 
-    LOWER(o.orderNumber) LIKE LOWER(CONCAT('%', :search, '%')) OR
-    LOWER(u.name) LIKE LOWER(CONCAT('%', :search, '%')) OR
-    LOWER(b.name) LIKE LOWER(CONCAT('%', :search, '%'))
+    LOWER(o.order_number::text) LIKE LOWER('%' || :search || '%') OR
+    LOWER(u.name::text) LIKE LOWER('%' || :search || '%') OR
+    LOWER(b.name::text) LIKE LOWER('%' || :search || '%')
 )
-AND (:date IS NULL OR DATE(o.createdAt) = :date)
+AND (:date IS NULL OR DATE(o.created_at) = :date)
+ORDER BY o.created_at DESC
+""", nativeQuery = true, countQuery = """
+SELECT COUNT(*)
+FROM orders o
+LEFT JOIN users u ON u.id = o.user_id
+LEFT JOIN branches b ON b.id = o.branch_id
+WHERE (:branchId IS NULL OR b.id = :branchId)
+AND (
+    :search IS NULL OR 
+    LOWER(o.order_number::text) LIKE LOWER('%' || :search || '%') OR
+    LOWER(u.name::text) LIKE LOWER('%' || :search || '%') OR
+    LOWER(b.name::text) LIKE LOWER('%' || :search || '%')
+)
+AND (:date IS NULL OR DATE(o.created_at) = :date)
 """)
-    Page<BranchesOrder> getAllOrdersForAllBranches(
+    Page<BranchesOrderView> getAllOrdersForAllBranches(
             @Param("branchId") Long branchId,
             @Param("search") String search,
             @Param("date") LocalDate date,

@@ -3,6 +3,7 @@ package com.Coffee.service.admin;
 import com.Coffee.dto.admin.request.BranchRequestDTO;
 import com.Coffee.dto.admin.response.BranchResponseDTO;
 import com.Coffee.dto.admin.response.BranchesOrder;
+import com.Coffee.dto.admin.response.BranchesOrderView;
 import com.Coffee.dto.user.response.UserBranchResponse;
 import com.Coffee.handler.ApiResponse;
 import com.Coffee.mapper.admin.BranchMapper;
@@ -150,9 +151,19 @@ public class BranchService {
     public ApiResponse<Page<BranchesOrder>> getAllOrdersForAllBranches(
             Long branchId, String search, LocalDate date , int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<BranchesOrder> ordersPage = branchRepository
+        Page<BranchesOrderView> ordersPage = branchRepository
                 .getAllOrdersForAllBranches(branchId, search, date , pageable);
-        return ApiResponse.success("Data Retrieved Success", ordersPage);
+        Page<BranchesOrder> mappedPage = ordersPage.map(view -> new BranchesOrder(
+                view.getOrderNumber(),
+                view.getUserName(),
+                view.getBranchName(),
+                view.getTotalPrice(),
+                view.getType(),
+                view.getCreatedAt(),
+                view.getBranchId(),
+                view.getStatus()
+        ));
+        return ApiResponse.success("Data Retrieved Success", mappedPage);
     }
 
 

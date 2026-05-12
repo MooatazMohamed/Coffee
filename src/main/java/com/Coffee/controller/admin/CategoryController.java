@@ -9,6 +9,7 @@ import com.Coffee.model.Category;
 import com.Coffee.service.admin.CategoryService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,8 +36,8 @@ public class CategoryController {
         return ApiResponse.success("Get Category successfully",categoryService.getCategoryWithAddons(categoryId)); // ,HttpStatus.OK
     }
     // create category
-    @PostMapping("")
-    public ApiResponse<CategoryResponseDTO>  createCategory(@Valid @RequestBody CategoryRequestDTO request) {
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<CategoryResponseDTO>  createCategory(@Valid @ModelAttribute CategoryRequestDTO request) {
         CategoryResponseDTO savedCategory = categoryService.createCategoryWithAddons(request);
         return ApiResponse.success("Category Created successfully",savedCategory); // ,HttpStatus.OK
 
@@ -44,8 +45,8 @@ public class CategoryController {
 
     }
     // update category
-    @PutMapping(value = "{categoryId}")
-    public ApiResponse<CategoryResponseDTO> updateCategory(@PathVariable Long categoryId, @Valid @RequestBody CategoryRequestDTO  categoryRequestDTO) throws IOException {
+    @PutMapping(value = "{categoryId}" , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<CategoryResponseDTO> updateCategory(@PathVariable Long categoryId, @Valid @ModelAttribute CategoryRequestDTO  categoryRequestDTO) throws IOException {
         return ApiResponse.success("Category updated successfully", categoryService.updateCategoryWithAddons(categoryId,categoryRequestDTO));
         //, HttpStatus.CREATED
     }

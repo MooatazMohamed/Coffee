@@ -4,12 +4,14 @@ import com.Coffee.dto.admin.request.AddonRequest;
 import com.Coffee.dto.admin.request.CategoryRequestDTO;
 import com.Coffee.dto.admin.response.AddonResponse;
 import com.Coffee.dto.admin.response.CategoryResponseDTO;
+import com.Coffee.helper.ImageHelper;
 import com.Coffee.model.Addon;
 import com.Coffee.model.Branch;
 import com.Coffee.model.Category;
 import com.Coffee.repository.user.AddonRepository;
 import com.Coffee.repository.user.CategoryRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +29,8 @@ public class CategoryService {
     private  CategoryRepository categoryRepository;
     @Autowired
     private  AddonRepository addonRepository;
+    @Autowired
+    private ImageHelper imageHelper;
 
     // get all categories
     public List<CategoryResponseDTO> getAllCategoryWithAddons(){
@@ -37,7 +41,13 @@ public class CategoryService {
     public CategoryResponseDTO createCategoryWithAddons(CategoryRequestDTO categoryRequest) {
         Category category = new Category();
         category.setName(categoryRequest.name());
-        category.setImageUrl(categoryRequest.imageUrl());
+        try {
+            String imageName = this.imageHelper.getImageOrDefault(categoryRequest.imageUrl(),"Categories");
+            category.setImageUrl(imageName);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to process product image", e);
+        }
+
 
         if (categoryRequest.addonList()!= null && !categoryRequest.addonList().isEmpty()) {
             // Fetch all addons by the provided IDs
@@ -88,7 +98,7 @@ public class CategoryService {
     } // end of createCategoryWithAddons
 
     // update category addon method
-    public CategoryResponseDTO updateCategoryWithAddons(  Long categoryId , CategoryRequestDTO categoryRequest) {
+    public CategoryResponseDTO updateCategoryWithAddons(  Long categoryId , CategoryRequestDTO categoryRequest) throws IOException {
         Category category =  categoryRepository.findById(categoryId).orElseThrow(() -> new RuntimeException("Category not found"));
 //                Optional<Category> category =  categoryRepository.findById(categoryId);
 //      if( !category.isPresent() )
@@ -97,7 +107,12 @@ public class CategoryService {
 //      }
 
         category.setName(categoryRequest.name());
-        category.setImageUrl(categoryRequest.imageUrl());
+        if (categoryRequest.imageUrl() != null    && !categoryRequest.imageUrl().isEmpty()) {
+            this.imageHelper.deleteImage(category.getImageUrl());
+            String image = this.imageHelper.getImageOrDefault(categoryRequest.imageUrl(),"Categories");
+            category.setImageUrl(image);
+        }
+
         List<Addon> addons = new ArrayList<>();
 
         if (categoryRequest.addonList() != null) {
@@ -146,16 +161,19 @@ long productCount = category.getProducts().stream().count();
             throw new RuntimeException("Should not delete Category Contain Products ");
         }
         category.setIsDeleted(true);
+        this.imageHelper.deleteImage(category.getImageUrl());
     this.categoryRepository.save(category);
 
 } // end of deleted category
 
     // convert category to dto
     public CategoryResponseDTO mapToDTO(Category category) {
+
+      String imageurl =com.Coffee.helper.ImageUrlHelper.buildImageUrl(category.getImageUrl());
         return new CategoryResponseDTO(
                 category.getId(),
                 category.getName(),
-                category.getImageUrl(),
+                imageurl,
                 category.getAddons().stream()
                         .map(addon -> new AddonResponse(
                                 addon.getId(),
